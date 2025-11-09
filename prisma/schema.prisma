@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Use Neon pooled connection URL
+}
+
+enum Region {
+  NORTH
+  EAST
+  WEST
+  SOUTH
+}
+
+model Material {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  price       Int      // store in paise (e.g., ₹199.00 => 19900)
+  unit        String   // e.g., "kg", "bag", "unit"
+  region      Region
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders      Order[]
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  materialId    String
+  quantity      Int
+  pincode       String
+  deliveryDays  Int
+  totalPrice    Int      // in paise
+  createdAt     DateTime @default(now())
+
+  material      Material @relation(fields: [materialId], references: [id])
+}
