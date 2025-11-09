@@ -4,28 +4,35 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") // Use Neon pooled connection URL
+  url      = env("DATABASE_URL")
 }
 
 enum Region {
   NORTH
+  SOUTH
   EAST
   WEST
-  SOUTH
 }
 
 model Material {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String
-  price       Int      // store in paise (e.g., ₹199.00 => 19900)
-  unit        String   // e.g., "kg", "bag", "unit"
-  region      Region
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  description     String
+  category        String
+  manufacturer    String
+  price           Int      // stored in paise
+  unit            String
+  region          Region
+  imageUrl        String?
+  inStock         Boolean
+  stockQty        Int
+  minDeliveryDays Int
+  maxDeliveryDays Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  orders      Order[]
+  orders          Order[]
 }
 
 model Order {
@@ -34,7 +41,7 @@ model Order {
   quantity      Int
   pincode       String
   deliveryDays  Int
-  totalPrice    Int      // in paise
+  totalPrice    Int
   createdAt     DateTime @default(now())
 
   material      Material @relation(fields: [materialId], references: [id])
